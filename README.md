@@ -25,15 +25,27 @@ A macOS menubar app that monitors the git status of your local repositories at a
 
 An additional warning badge appears when you're working directly on `main` or `master`.
 
+## Install
+
+```bash
+brew tap TimBroddin/tap
+brew install --cask gitstatus
+```
+
+Or download the latest release from the [Releases page](https://github.com/TimBroddin/gitstatus/releases).
+
 ## Getting Started
+
+1. Click the branch icon in your menubar
+2. Open Settings and add a scan directory (e.g. `~/Projects`)
+3. Scan for repos and select which ones to track
+
+## Building from Source
 
 1. Open the project in Xcode
 2. Build and run (macOS 14.0+)
-3. Click the branch icon in your menubar
-4. Open Settings and add a scan directory (e.g. `~/Projects`)
-5. Scan for repos and select which ones to track
 
-## Requirements
+### Requirements
 
 - macOS 14.0+
 - Xcode 15+
