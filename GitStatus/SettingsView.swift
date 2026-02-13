@@ -285,21 +285,24 @@ struct GeneralTab: View {
                     get: {
                         switch store.config.openWith {
                         case .terminal: return 0
-                        case .finder: return 1
-                        case .custom: return 2
+                        case .ghostty: return 1
+                        case .finder: return 2
+                        case .custom: return 3
                         }
                     },
                     set: { val in
                         switch val {
                         case 0: store.config.openWith = .terminal
-                        case 1: store.config.openWith = .finder
+                        case 1: store.config.openWith = .ghostty
+                        case 2: store.config.openWith = .finder
                         default: store.config.openWith = .custom(path: "")
                         }
                     }
                 )) {
                     Text("Terminal").tag(0)
-                    Text("Finder").tag(1)
-                    Text("Custom app...").tag(2)
+                    Text("Ghostty").tag(1)
+                    Text("Finder").tag(2)
+                    Text("Custom app...").tag(3)
                 }
                 .pickerStyle(.radioGroup)
 
@@ -355,7 +358,7 @@ struct AboutTab: View {
                 .font(.title)
                 .fontWeight(.semibold)
 
-            Text("v1.0")
+            Text("v1.1")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
 

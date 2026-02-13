@@ -31,6 +31,7 @@ enum RepoState: Int, Codable, Comparable {
 
 enum OpenWith: Codable, Equatable {
     case terminal
+    case ghostty
     case finder
     case custom(path: String)
 }

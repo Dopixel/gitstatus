@@ -87,11 +87,15 @@ final class RepoStore {
         let url = URL(fileURLWithPath: repo.path)
         switch config.openWith {
         case .terminal:
-            let script = "tell application \"Terminal\" to do script \"cd \(repo.path.replacingOccurrences(of: "\"", with: "\\\""))\""
-            if let appleScript = NSAppleScript(source: script) {
-                var error: NSDictionary?
-                appleScript.executeAndReturnError(&error)
-            }
+            let proc = Process()
+            proc.executableURL = URL(fileURLWithPath: "/usr/bin/open")
+            proc.arguments = ["-a", "Terminal", repo.path]
+            try? proc.run()
+        case .ghostty:
+            let proc = Process()
+            proc.executableURL = URL(fileURLWithPath: "/usr/bin/open")
+            proc.arguments = ["-a", "Ghostty", repo.path]
+            try? proc.run()
         case .finder:
             NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: repo.path)
         case .custom(let appPath):

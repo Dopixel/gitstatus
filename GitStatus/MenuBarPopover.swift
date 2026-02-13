@@ -103,11 +103,28 @@ struct MenuBarPopover: View {
                 ScrollView {
                     LazyVStack(spacing: 0) {
                         ForEach(filteredRepos, id: \.0.id) { repo, status in
-                            RepoRow(repo: repo, status: status, showDot: filter == .all)
-                                .contentShape(Rectangle())
-                                .onTapGesture {
+                            Button {
+                                store.openRepo(repo)
+                            } label: {
+                                RepoRow(repo: repo, status: status, showDot: filter == .all)
+                            }
+                            .buttonStyle(.plain)
+                            .contextMenu {
+                                Button("Push") {
+                                    GitActions.push(path: repo.path) {
+                                        monitor?.refresh()
+                                    }
+                                }
+                                Button("Pull") {
+                                    GitActions.pull(path: repo.path) {
+                                        monitor?.refresh()
+                                    }
+                                }
+                                Divider()
+                                Button("Open") {
                                     store.openRepo(repo)
                                 }
+                            }
                         }
                     }
                     .padding(.vertical, 4)
@@ -237,10 +254,21 @@ struct RepoRow: View {
                             .help("On default branch")
                     }
                 }
-                Text(status.currentBranch)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
+                HStack(spacing: 4) {
+                    Text(status.currentBranch)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                    if showDot, status.state != .clean {
+                        Text("·")
+                            .font(.caption)
+                            .foregroundStyle(.tertiary)
+                        Text(status.state.label)
+                            .font(.caption)
+                            .foregroundStyle(statusColor)
+                            .lineLimit(1)
+                    }
+                }
             }
 
             Spacer()
@@ -257,4 +285,23 @@ struct RepoRow: View {
         case .behind: .red
         }
     }
+}
+
+// MARK: - Git Actions
+
+enum GitActions {
+    static func push(path: String, completion: @escaping () -> Void) {
+        Task.detached {
+            _ = GitChecker.runGit(in: path, args: ["push"])
+            await MainActor.run { completion() }
+        }
+    }
+
+    static func pull(path: String, completion: @escaping () -> Void) {
+        Task.detached {
+            _ = GitChecker.runGit(in: path, args: ["pull"])
+            await MainActor.run { completion() }
+        }
+    }
+
 }

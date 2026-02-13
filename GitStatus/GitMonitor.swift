@@ -93,7 +93,7 @@ nonisolated enum GitChecker {
         return RepoStatus(state: state, onDefaultBranch: onDefault, currentBranch: branch, lastChecked: Date())
     }
 
-    private static func runGit(in directory: String, args: [String]) -> String? {
+    static func runGit(in directory: String, args: [String]) -> String? {
         let process = Process()
         let pipe = Pipe()
         process.executableURL = URL(fileURLWithPath: "/usr/bin/git")
