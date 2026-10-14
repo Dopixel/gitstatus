@@ -253,13 +253,28 @@ struct RepoRow: View {
                             .foregroundStyle(.orange)
                             .help("On default branch")
                     }
+                    if let warning = status.fetchWarning {
+                        Image(systemName: "icloud.slash")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                            .help(warning)
+                    }
                 }
                 HStack(spacing: 4) {
                     Text(status.currentBranch)
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
-                    if showDot, status.state != .clean {
+                    if let error = status.error {
+                        Text("·")
+                            .font(.caption)
+                            .foregroundStyle(.tertiary)
+                        Text(error)
+                            .font(.caption)
+                            .foregroundStyle(.red)
+                            .lineLimit(1)
+                            .help(error)
+                    } else if showDot, status.state != .clean {
                         Text("·")
                             .font(.caption)
                             .foregroundStyle(.tertiary)
@@ -278,6 +293,7 @@ struct RepoRow: View {
     }
 
     private var statusColor: Color {
+        if status.error != nil { return .gray }
         switch status.state {
         case .clean: .green
         case .uncommitted: .yellow

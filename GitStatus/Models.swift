@@ -57,4 +57,8 @@ struct RepoStatus {
     var onDefaultBranch: Bool = false
     var currentBranch: String = "unknown"
     var lastChecked: Date? = nil
+    /// Set when git could not be run or failed, so the real state is unknown (never show it as clean).
+    var error: String? = nil
+    /// Set when `git fetch` failed, so "behind" information may be stale.
+    var fetchWarning: String? = nil
 }
