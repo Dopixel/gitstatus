@@ -106,7 +106,7 @@ struct MenuBarPopover: View {
                             Button {
                                 store.openRepo(repo)
                             } label: {
-                                RepoRow(repo: repo, status: status, showDot: filter == .all)
+                                RepoRow(repo: repo, status: status, showDot: filter == .all, showDefaultBranchWarning: store.config.showDefaultBranchWarning)
                             }
                             .buttonStyle(.plain)
                             .contextMenu {
@@ -233,6 +233,7 @@ struct RepoRow: View {
     let repo: TrackedRepo
     let status: RepoStatus
     var showDot: Bool = true
+    var showDefaultBranchWarning: Bool = true
 
     var body: some View {
         HStack(spacing: 8) {
@@ -247,7 +248,7 @@ struct RepoRow: View {
                     Text(repo.displayName)
                         .font(.system(.body, weight: .medium))
                         .lineLimit(1)
-                    if status.onDefaultBranch {
+                    if showDefaultBranchWarning, status.onDefaultBranch {
                         Image(systemName: "exclamationmark.triangle.fill")
                             .font(.caption2)
                             .foregroundStyle(.orange)

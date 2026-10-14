@@ -282,6 +282,13 @@ struct GeneralTab: View {
                 }
             }
 
+            Section("Display") {
+                Toggle("Warn when working on main or master", isOn: Binding(
+                    get: { store.config.showDefaultBranchWarning },
+                    set: { store.config.showDefaultBranchWarning = $0 }
+                ))
+            }
+
             Section("Open repos with") {
                 Picker("Application", selection: Binding(
                     get: {
