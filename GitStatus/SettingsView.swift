@@ -253,6 +253,8 @@ struct ReposTab: View {
 
 struct GeneralTab: View {
     var store: RepoStore
+    @State private var loginStatus = LoginItem.status
+    @State private var loginError: String?
 
     var body: some View {
         Form {
@@ -327,19 +329,53 @@ struct GeneralTab: View {
 
             Section("Startup") {
                 Toggle("Launch at login", isOn: Binding(
-                    get: { store.config.launchAtLogin },
-                    set: { newValue in
-                        store.config.launchAtLogin = newValue
-                        if newValue {
-                            try? SMAppService.mainApp.register()
-                        } else {
-                            try? SMAppService.mainApp.unregister()
-                        }
-                    }
+                    get: { loginStatus == .enabled },
+                    set: { setLaunchAtLogin($0) }
                 ))
+
+                if loginStatus == .requiresApproval {
+                    HStack {
+                        Text("Disabled in System Settings. Allow GitStatus under Login Items.")
+                            .font(.caption)
+                            .foregroundStyle(.orange)
+                        Spacer()
+                        Button("Open Login Items") { LoginItem.openSystemSettings() }
+                    }
+                } else if loginStatus == .notFound {
+                    Text("macOS cannot find the app. Move GitStatus to /Applications and try again.")
+                        .font(.caption)
+                        .foregroundStyle(.orange)
+                }
+                if let loginError {
+                    Text(loginError)
+                        .font(.caption)
+                        .foregroundStyle(.red)
+                }
             }
         }
+        .onAppear { refreshLoginStatus() }
+        .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
+            refreshLoginStatus()
+        }
         .formStyle(.grouped)
+    }
+
+    private func refreshLoginStatus() {
+        loginStatus = LoginItem.status
+        store.config.launchAtLogin = LoginItem.isRegistered
+    }
+
+    private func setLaunchAtLogin(_ enabled: Bool) {
+        loginError = nil
+        do {
+            try LoginItem.setEnabled(enabled)
+        } catch {
+            loginError = "Could not \(enabled ? "enable" : "disable") launch at login: \(error.localizedDescription)"
+        }
+        refreshLoginStatus()
+        if enabled, loginStatus == .requiresApproval {
+            LoginItem.openSystemSettings()
+        }
     }
 }
 
