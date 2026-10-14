@@ -295,10 +295,10 @@ struct RepoRow: View {
     private var statusColor: Color {
         if status.error != nil { return .gray }
         switch status.state {
-        case .clean: .green
-        case .uncommitted: .yellow
-        case .notPushed: .orange
-        case .behind: .red
+        case .clean: return .green
+        case .uncommitted: return .yellow
+        case .notPushed: return .orange
+        case .behind: return .red
         }
     }
 }
